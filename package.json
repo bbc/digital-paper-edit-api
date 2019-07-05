@@ -29,8 +29,7 @@
     "cuid": "^2.1.6",
     "dotenv": "^8.0.0",
     "express": "^4.16.4",
-    "formidable": "^1.2.1",
-    "fs": "0.0.1-security"
+    "formidable": "^1.2.1"
   },
   "devDependencies": {
     "aws-sdk-mock": "^4.5.0",
