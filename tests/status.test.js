@@ -29,9 +29,6 @@ describe('Test Status API', () => {
 
 describe('Test SNS API', () => {
   beforeEach('setup mock objects', () => {
-    AWSMock.mock('SNS', 'publish', (err, cb) => {
-      cb();
-    });
     const request = {
       body: {},
     };
@@ -43,10 +40,21 @@ describe('Test SNS API', () => {
     AWSMock.restore('SNS', 'publish');
   });
 
-  describe('sendMessage()', () => {
-    it('Should successfully send message', () => {
-      sendMessage(this.req, this.res);
-      expect(this.res.sendStatus).to.be.calledWith(200);
+  it('Should successfully send message', () => {
+    const msgBody = 'Success';
+    AWSMock.mock('SNS', 'publish', (err, cb) => {
+      cb(null, msgBody);
     });
+    sendMessage(this.req, this.res);
+    expect(this.res.json).to.be.calledOnceWith({ message: msgBody });
+  });
+
+  it('Should fail to send message', () => {
+    const err = new Error('Failed');
+    AWSMock.mock('SNS', 'publish', (error, cb) => {
+      cb(err);
+    });
+    sendMessage(this.req, this.res);
+    expect(this.res.json).to.be.calledOnceWith({ err });
   });
 });
