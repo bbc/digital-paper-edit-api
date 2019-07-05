@@ -6,8 +6,12 @@ const result = dotenv.config();
 if (result.error) {
   throw result.error;
 }
-const envConfig = dotenv.parse(fs.readFileSync('.env.override'));
 
-for (const k in envConfig) {
-  process.env[k] = envConfig[k];
+try {
+  const envConfig = dotenv.parse(fs.readFileSync('.env.override'));
+  envConfig.forEach((k) => {
+    process.env[k] = envConfig[k];
+  });
+} catch (err) {
+  console.log('No override file found');
 }
