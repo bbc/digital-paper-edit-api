@@ -4,12 +4,12 @@ const AWSMock = require('aws-sdk-mock');
 const AWS = require('aws-sdk');
 const sinon = require('sinon');
 const sinonChai = require('sinon-chai');
-const { publish } = require('../components/MessageBroker');
+const { publish } = require('../lib/messageBroker');
 
 AWSMock.setSDKInstance(AWS);
 chai.use(sinonChai);
 
-describe('Test MessageBroker Component', () => {
+describe('Test messageBroker', () => {
   beforeEach('setup spy and mock vars', () => {
     this.publishSpy = sinon.spy();
     AWSMock.mock('SNS', 'publish', this.publishSpy);
