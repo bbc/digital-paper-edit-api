@@ -2,8 +2,11 @@
 const express = require('express');
 const bodyParser = require('body-parser');
 const url = require('url');
+
 const app = express();
 const router = express.Router();
+
+require('./config');
 
 // https://stackoverflow.com/questions/24543847/req-body-empty-on-posts
 // https://github.com/expressjs/body-parser#limit
@@ -11,11 +14,11 @@ const router = express.Router();
 app.use(bodyParser.json( { limit: '50MB' } ));
 
 app.use(bodyParser.urlencoded({
-  extended: true
+  extended: true,
 }));
 const port = process.env.PORT || 8080;
 
-app.use(function (req, res, next) {
+app.use((req, res, next) => {
   res.header('Access-Control-Allow-Origin', '*');
   res.header('Access-Control-Allow-Methods', 'GET, PUT, POST, DELETE, OPTIONS');
   res.header('Access-Control-Allow-Headers', 'Origin, X-Requested-With, Content-Type, Accept, Authorization');
@@ -26,15 +29,15 @@ app.use(function (req, res, next) {
 
 // list all available rotues
 app.get('/', (req, res) => {
-  const fullUrl = req.protocol + '://' + req.get('host') + req.originalUrl;
+  const fullUrl = `${ req.protocol }://${ req.get('host') }${ req.originalUrl }`;
   const results = [];
   // https://stackoverflow.com/questions/14934452/how-to-get-all-registered-routes-in-express/14934933
-  app._router.stack.forEach(function(r) {
+  app._router.stack.forEach((r) => {
     if (r.route && r.route.path) {
       results.push({
         path: r.route.path,
         url: url.resolve(fullUrl, r.route.path),
-        methods: r.route.methods
+        methods: r.route.methods,
       });
     }
   });
@@ -50,6 +53,10 @@ require('./routes/annotations.js')(app);
 // TODO: status should probably not always return ok?
 // eg if server is failing/crashed should return something else
 // so that the instance can be terminated? or is not necessary to do this explicitly?
-require('./routes/status.js')(app);
+
+const status = require('./routes/status');
+
+app.get('/status', status.healthCheck);
+app.get('/queue', status.sendMessage);
 
 app.listen(port, () => console.log(`App listening on port ${ port }!`));

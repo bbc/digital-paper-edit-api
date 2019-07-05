@@ -4,7 +4,7 @@
   "description": "",
   "main": "index.js",
   "scripts": {
-    "test": "echo \"Error: no test specified\" && exit 1",
+    "test": "mocha ./tests --recursive",
     "start": "node index.js",
     "publish:public": "npm publish --access public",
     "start:dev": "nodemon index.js",
@@ -24,15 +24,26 @@
   },
   "license": "MIT",
   "dependencies": {
+    "aws-sdk": "^2.482.0",
     "body-parser": "^1.19.0",
     "cuid": "^2.1.6",
+    "dotenv": "^8.0.0",
     "express": "^4.16.4",
-    "express-graphql": "^0.8.0",
-    "formidable": "^1.2.1",
-    "graphql": "^14.2.1"
+    "formidable": "^1.2.1"
   },
   "devDependencies": {
+    "aws-sdk-mock": "^4.5.0",
+    "chai": "^4.2.0",
+    "chai-as-promised": "^7.1.1",
+    "eslint": "^5.16.0",
+    "eslint-config-airbnb": "^17.1.1",
+    "eslint-plugin-import": "^2.18.0",
+    "eslint-plugin-jsx-a11y": "^6.2.3",
+    "mocha": "^6.1.4",
     "nodemon": "^1.18.11",
+    "sinon": "^7.3.2",
+    "sinon-chai": "^3.3.0",
+    "sinon-express-mock": "^2.2.0",
     "speculate": "^2.0.0"
   },
   "spec": {
