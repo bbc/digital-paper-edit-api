@@ -85,3 +85,5 @@ typings/
 SOURCES/
 SPECS/
 *.service
+
+.vscode
