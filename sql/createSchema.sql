@@ -73,7 +73,7 @@ CREATE TABLE IF NOT EXISTS "Annotations" (
 CREATE TABLE IF NOT EXISTS "Paper_edits" (
 	"id" serial NOT NULL UNIQUE,
 	"title" TEXT NOT NULL,
-	"desctiption" TEXT NOT NULL,
+	"description" TEXT NOT NULL,
 	"data" json NOT NULL,
 	"project_id" serial NOT NULL UNIQUE,
 	"created_at" timestamp with time zone NOT NULL,
