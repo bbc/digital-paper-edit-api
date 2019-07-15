@@ -1,7 +1,7 @@
 exports.seed = (knex) => {
-  const dropFk = 'ALTER TABLE "Annotations" DROP CONSTRAINT IF EXISTS "Annotations_fk0"; ALTER TABLE "Annotations" DROP CONSTRAINT IF EXISTS "Annotations_fk1"; ALTER TABLE "Annotations" DROP CONSTRAINT IF EXISTS "Annotations_fk2";';
-  knex.schema.raw(dropFk)
-    .catch(err => console.error(err));
+  knex.schema.table('Annotations', (table) => {
+    table.dropForeign([ 'Annotations_fk0', 'Annotations_fk1', 'Annotations_fk2' ]);
+  });
 
   return knex('Annotations').del()
     .then(() => knex('Annotations').insert([
