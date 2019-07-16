@@ -34,29 +34,7 @@ npm install
 
 alternatively for production is also on [npm](https://www.npmjs.com/package/@bbc/digital-paper-edit-api)
 
-.env file should include:
-
-```
-AWS_REGION=
-AWS_ACCOUNT=
-SNS_TOPIC=
-AWS_KEY_ID=
-AWS_SECRET_KEY=
-
-NODE_ENV=
-PORT=
-
-LOG_NAME=
-LOG_LEVEL=
-LOG_FILE=
-LOG_ERROR=
-
-DB_USER=
-DB_HOST=
-DB_NAME=
-DB_PASSWORD=
-DB_PORT=
-```
+Make sure to update your .env file. 
 
 ## Usage - development
 
