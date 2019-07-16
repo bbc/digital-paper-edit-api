@@ -1,7 +1,7 @@
 exports.seed = (knex) => {
-  const foreignKeys = 'ALTER TABLE "Annotations" DROP CONSTRAINT IF EXISTS "Annotations_fk2";';
+  const dropForeignKeys = 'ALTER TABLE "Annotations" DROP CONSTRAINT IF EXISTS "Annotations_fk2";';
 
-  knex.schema.raw(foreignKeys)
+  knex.schema.raw(dropForeignKeys)
     .catch(err => console.error(err));
 
   knex('Labels').del()

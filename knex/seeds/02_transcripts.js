@@ -4,9 +4,12 @@ exports.seed = async (knex) => {
   const kateTranscript = JSON.parse(fs.readFileSync('./sample-data/transcripts/kate.transcript.sample.json'));
   const ivanTranscript = JSON.parse(fs.readFileSync('./sample-data/transcripts/ivan.transcript.sample.json'));
   const morganTranscript = JSON.parse(fs.readFileSync('./sample-data/transcripts/morgan.transcript.sample.json'));
-  const foreignKeys = 'ALTER TABLE "Transcripts" DROP CONSTRAINT IF EXISTS "Transcripts_fk0"; ALTER TABLE "users_projects" DROP CONSTRAINT IF EXISTS "users_projects_fk1"; ALTER TABLE "Annotations" DROP CONSTRAINT IF EXISTS "Annotations_fk1"; ALTER TABLE "users_transcripts" DROP CONSTRAINT IF EXISTS "users_transcripts_fk1";';
+  const dropForeignKeys = `ALTER TABLE "Transcripts" DROP CONSTRAINT IF EXISTS "Transcripts_fk0"; 
+  ALTER TABLE "users_projects" DROP CONSTRAINT IF EXISTS "users_projects_fk1"; 
+  ALTER TABLE "Annotations" DROP CONSTRAINT IF EXISTS "Annotations_fk1"; 
+  ALTER TABLE "users_transcripts" DROP CONSTRAINT IF EXISTS "users_transcripts_fk1";'`;
 
-  return knex.schema.raw(foreignKeys)
+  return knex.schema.raw(dropForeignKeys)
     .catch(err => console.error(err))
     .then(() => knex('Transcripts').del()
       .then(() => knex('Transcripts').insert([

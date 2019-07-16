@@ -1,6 +1,8 @@
 exports.seed = (knex) => {
-  const foreignKeys = 'ALTER TABLE "users_paper_edits" DROP CONSTRAINT IF EXISTS "users_paper_edits_fk0"; ALTER TABLE "users_paper_edits" DROP CONSTRAINT IF EXISTS "users_paper_edits_fk1";';
-  knex.schema.raw(foreignKeys)
+  const dropForeignKeys = `ALTER TABLE "users_paper_edits" DROP CONSTRAINT IF EXISTS "users_paper_edits_fk0"; 
+  ALTER TABLE "users_paper_edits" DROP CONSTRAINT IF EXISTS "users_paper_edits_fk1";`;
+
+  knex.schema.raw(dropForeignKeys)
     .catch(err => console.error(err));
 
   return knex('users_paper_edits').del()
