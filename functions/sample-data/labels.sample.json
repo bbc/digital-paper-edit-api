@@ -1,0 +1,74 @@
+{
+  "labels": [
+    {
+      "id": "default",
+      "value": "default",
+      "label": "Default",
+      "color": "orange",
+      "description": "A default label"
+    },
+    {
+      "id": "129cjw29xii80000ird74yb19swa",
+      "value": "economics",
+      "label": "Economics",
+      "color": "brown",
+      "description": "Test description 1"
+    },
+    {
+      "id": "229cjw29xii80000ird74yb19swa",
+      "value": "introduction",
+      "label": "Introduction",
+      "color": "darkblue",
+      "description": "Test description 2"
+    },
+    {
+      "id": "329cjw29xii80000ird74yb19swa",
+      "value": "brexit",
+      "label": "Brexit",
+      "color": "#FF5630",
+      "description": "Brexit description"
+    },
+    {
+      "id": "429cjw29xii80000ird74yb19swa",
+      "value": "conclusion",
+      "label": "Conclusion",
+      "color": "#FF8B00",
+      "description": "Conclusion Description"
+    },
+    {
+      "id": "529cjw29xii80000ird74yb19swa",
+      "value": "europe",
+      "label": "Europe",
+      "color": "#FFC400",
+      "description": "Europe Description"
+    },
+    {
+      "id": "629cjw29xii80000ird74yb19swa",
+      "value": "ritual",
+      "label": "Ritual",
+      "color": "#36B37E",
+      "description": "Ritual Description"
+    },
+    {
+      "id": "729cjw29xii80000ird74yb19swa",
+      "value": "negotiation",
+      "label": "Negotiation",
+      "color": "#00875A",
+      "description": "Negotiation Description"
+    },
+    {
+      "id": "829cjw29xii80000ird74yb19swa",
+      "value": "computer vision",
+      "label": "Computer vision",
+      "color": "#253858",
+      "description": "Computer Vision Description"
+    },
+    {
+      "id": "929cjw29xii80000ird74yb19swa",
+      "value": "open source",
+      "label": "Open Source",
+      "color": "#666666",
+      "description": "Open Source Description"
+    }
+  ]
+}
