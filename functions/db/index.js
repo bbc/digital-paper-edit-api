@@ -7,4 +7,51 @@ admin.initializeApp({
 });
 
 const db = admin.firestore();
-module.exports = db;
+
+const getCollection = async collection => {
+  let query = db.collection(collection);
+  const querySnapshot = await query.get();
+  let docs = querySnapshot.docs;
+  return docs.map(doc => {
+    let data = doc.data();
+    data.id = doc.id;
+    return data;
+  });
+};
+
+const getItem = async (collection, id) => {
+  const document = db.collection(collection).doc(id);
+  let item = await document.get();
+  return item.data();
+};
+
+const postItem = async (collection, data) => {
+  await db
+    .collection(collection)
+    .doc("/" + cuid() + "/")
+    .create(data);
+};
+
+const putItem = async (collection, id, data) => {
+  await db
+    .collection(collection)
+    .doc(id)
+    .update(data);
+};
+
+const deleteItem = async (collection, id) => {
+  await db
+    .collection(collection)
+    .doc(id)
+    .delete();
+};
+
+module.exports = {
+  db,
+  getCollection,
+  getItem,
+  updateItem,
+  postItem,
+  putItem,
+  deleteItem
+};

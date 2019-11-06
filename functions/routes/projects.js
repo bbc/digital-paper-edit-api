@@ -1,9 +1,11 @@
 const cuid = require("cuid");
-
+const { getCollection, getItem } = require("../db");
 const data = require("../sample-data/projects.sample.json");
 
+COLLECTION = "projects";
+
 module.exports = app => {
-  app.post("/api/projects", (req, res) => {
+  app.post("/api/projects", async (req, res) => {
     const project = {
       title: req.body.title,
       description: req.body.description,
@@ -17,16 +19,14 @@ module.exports = app => {
     res.status(201).json({ status: "ok", project });
   });
 
-  app.get("/api/projects", (req, res) => {
-    console.log("GET: Projects");
-    res.status(200).json(data);
+  app.get("/api/projects", async (req, res) => {
+    let response = await getCollection(COLLECTION);
+    return res.status(200).send(response);
   });
 
-  app.get("/api/projects/:projectId", (req, res) => {
-    const projectId = req.params.projectId;
-
-    const project = data.projects.find(p => p.id === projectId);
-    console.log(`GET: Project id ${req.params.projectId}`);
+  app.get("/api/projects/:id", async (req, res) => {
+    const projectId = req.params.id;
+    const project = await getItem(COLLECTION, projectId);
     res.status(200).json({ project });
   });
 
