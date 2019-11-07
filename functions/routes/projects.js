@@ -1,5 +1,11 @@
 const cuid = require("cuid");
-const { getCollection, getItem } = require("../db");
+const {
+  getCollection,
+  getItem,
+  deleteItem,
+  updateItem,
+  postItem
+} = require("../db");
 const data = require("../sample-data/projects.sample.json");
 
 COLLECTION = "projects";

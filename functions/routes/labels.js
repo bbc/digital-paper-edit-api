@@ -1,5 +1,12 @@
 const cuid = require("cuid");
 
+const {
+  getCollection,
+  getItem,
+  deleteItem,
+  updateItem,
+  postItem
+} = require("../db");
 const data = require("../sample-data/labels.sample.json");
 
 module.exports = app => {
