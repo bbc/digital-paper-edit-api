@@ -6,7 +6,9 @@ const {
   updateItem,
   postItem
 } = require("../db");
+
 const data = require("../sample-data/annotations.sample.json");
+const COLLECTION = "annotations";
 
 module.exports = app => {
   app.post(
@@ -44,6 +46,7 @@ module.exports = app => {
   app.get(
     "/api/projects/:projectId/transcripts/:transcriptId/annotations/:annotationId",
     (req, res) => {
+      getItem(COLLECTION, id);
       const projectId = req.params.projectId;
       const transcriptId = req.params.transcriptId;
       const annotationId = req.params.annotationId;

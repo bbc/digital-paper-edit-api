@@ -6,9 +6,9 @@ const {
   updateItem,
   postItem
 } = require("../db");
-const data = require("../sample-data/projects.sample.json");
 
-COLLECTION = "projects";
+const data = require("../sample-data/projects.sample.json");
+const COLLECTION = "projects";
 
 module.exports = app => {
   app.post("/api/projects", async (req, res) => {
