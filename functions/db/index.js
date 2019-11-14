@@ -50,7 +50,6 @@ module.exports = {
   db,
   getCollection,
   getItem,
-  updateItem,
   postItem,
   putItem,
   deleteItem

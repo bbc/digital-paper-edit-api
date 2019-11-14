@@ -4,7 +4,7 @@ const {
   getCollection,
   getItem,
   deleteItem,
-  updateItem,
+  putItem,
   postItem
 } = require("../db");
 const data = require("../sample-data/labels.sample.json");

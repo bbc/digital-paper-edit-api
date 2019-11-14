@@ -37,9 +37,7 @@ module.exports = app => {
       console.log(
         `GET: Annotations for transcript ${transcriptId} in project ${projectId}`
       );
-      res.status(200).json({
-        ...data
-      });
+      res.status(200).json(...data);
     }
   );
 
