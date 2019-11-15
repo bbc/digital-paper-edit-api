@@ -1,28 +1,26 @@
-const cuid = require('cuid');
-const moment = require('moment');
+// const cuid = require('cuid');
+
 const logger = require('../lib/logger.js');
 const knex = require('../knex/knex');
+const date = require('../lib/utils').postgresDate;
 
 const TABLE = 'Projects';
 
 module.exports = (app) => {
   app.post('/api/projects', (req, res, next) => {
-    const date = moment().format('YYYY-MM-DD HH:mm:ss');
-    console.log(date);
-
     const project = {
       // id: cuid(),
       title: req.body.title,
       description: req.body.description,
-      created_at: date,
-      updated_at: date,
+      created_at: date(),
+      updated_at: date(),
     };
 
     knex(TABLE)
       .insert(project)
       .then(() => {
         logger.info(`POST: New project ${ project.id }`);
-        res.status(201).json({ status: 'ok', project });
+        res.status(201).json({ status: 'OK', project });
       }).catch((err) => {
         logger.error(`DB error - projects - ${ err }`);
 
@@ -30,7 +28,7 @@ module.exports = (app) => {
       });
   });
 
-  app.get('/api/projects', (req, res) => {
+  app.get('/api/projects', (req, res, next) => {
     logger.info('GET: Projects');
 
     knex(TABLE)
@@ -44,7 +42,7 @@ module.exports = (app) => {
       });
   });
 
-  app.get('/api/projects/:projectId', (req, res) => {
+  app.get('/api/projects/:projectId', (req, res, next) => {
     const projectId = req.params.projectId;
 
     knex(TABLE)
@@ -59,21 +57,19 @@ module.exports = (app) => {
       });
   });
 
-  app.put('/api/projects/:projectId', (req, res) => {
+  app.put('/api/projects/:projectId', (req, res, next) => {
     const projectId = req.params.projectId;
-
-    const newProject = {
-      id: projectId,
-      title: req.body.title,
-      description: req.body.description,
-    };
 
     knex(TABLE)
       .where('id', '=', projectId)
-      .update(newProject)
+      .update({
+        title: req.body.title,
+        description: req.body.description,
+        updated_at: date(),
+      })
       .then(() => {
         logger.info(`PUT: Edit project id ${ req.params.projectId }`);
-        res.status(200).json({ status: 'ok', project: newProject });
+        res.status(200).json({ status: 'OK' });
       })
       .catch((err) => {
         logger.error(`DB error - projects - ${ err }`);
@@ -82,7 +78,7 @@ module.exports = (app) => {
       });
   });
 
-  app.delete('/api/projects/:projectId/', (req, res) => {
+  app.delete('/api/projects/:projectId/', (req, res, next) => {
     const projectId = req.params.projectId;
 
     knex(TABLE)
