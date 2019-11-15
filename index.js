@@ -26,6 +26,7 @@ const routes = fs.readdirSync(routePath).filter(file => (/.js$/).test(file));
 // eslint-disable-next-line global-require, import/no-dynamic-require
 routes.forEach(route => require(routePath + route)(app));
 
+// error handler
 app.use((err, req, res, next) => {
   const statusCode = err.statusCode || 500;
   const errorMessage = err.message || 'Something went wrong!';

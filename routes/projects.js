@@ -1,34 +1,62 @@
 const cuid = require('cuid');
+const moment = require('moment');
 const logger = require('../lib/logger.js');
+const knex = require('../knex/knex');
 
-const data = require('../sample-data/projects.sample.json');
+const TABLE = 'Projects';
 
 module.exports = (app) => {
-  app.post('/api/projects', (req, res) => {
+  app.post('/api/projects', (req, res, next) => {
+    const date = moment().format('YYYY-MM-DD HH:mm:ss');
+    console.log(date);
+
     const project = {
+      // id: cuid(),
       title: req.body.title,
       description: req.body.description,
-      id: cuid(),
-      created: Date(),
+      created_at: date,
+      updated_at: date,
     };
 
-    data.projects.push(project);
+    knex(TABLE)
+      .insert(project)
+      .then(() => {
+        logger.info(`POST: New project ${ project.id }`);
+        res.status(201).json({ status: 'ok', project });
+      }).catch((err) => {
+        logger.error(`DB error - projects - ${ err }`);
 
-    logger.info(`POST: New project ${ project.id }`);
-    res.status(201).json({ status: 'ok', project });
+        return next(err);
+      });
   });
 
   app.get('/api/projects', (req, res) => {
     logger.info('GET: Projects');
-    res.status(200).json(data);
+
+    knex(TABLE)
+      .select('*')
+      .then((data) => {
+        res.status(200).json(data);
+      }).catch((err) => {
+        logger.error(`DB error - projects - ${ err }`);
+
+        return next(err);
+      });
   });
 
   app.get('/api/projects/:projectId', (req, res) => {
     const projectId = req.params.projectId;
 
-    const project = data.projects.find(p => p.id === projectId);
-    logger.info(`GET: Project id ${ req.params.projectId }`);
-    res.status(200).json({ project });
+    knex(TABLE)
+      .where('id', '=', projectId)
+      .then((data) => {
+        logger.info(`GET: Project id ${ req.params.projectId }`);
+        res.status(200).json(data);
+      }).catch((err) => {
+        logger.error(`DB error - projects - ${ err }`);
+
+        return next(err);
+      });
   });
 
   app.put('/api/projects/:projectId', (req, res) => {
@@ -40,20 +68,34 @@ module.exports = (app) => {
       description: req.body.description,
     };
 
-    const projectIndex = data.projects.findIndex(item => item.id === projectId);
-    data.projects[projectIndex] = newProject;
+    knex(TABLE)
+      .where('id', '=', projectId)
+      .update(newProject)
+      .then(() => {
+        logger.info(`PUT: Edit project id ${ req.params.projectId }`);
+        res.status(200).json({ status: 'ok', project: newProject });
+      })
+      .catch((err) => {
+        logger.error(`DB error - projects - ${ err }`);
 
-    logger.info(`PUT: Edit project id ${ req.params.projectId }`);
-    res.status(200).json({ status: 'ok', project: newProject });
+        return next(err);
+      });
   });
 
   app.delete('/api/projects/:projectId/', (req, res) => {
     const projectId = req.params.projectId;
 
-    const projectToDelete = data.projects.find(p => p.id === projectId);
-    data.projects = data.projects.filter(p => p.id !== projectToDelete.id);
+    knex(TABLE)
+      .where('id', '=', projectId)
+      .del()
+      .then(() => {
+        logger.info(`DELETE: Project id ${ projectId }`);
+        res.status(204).json({ status: 'ok' });
+      })
+      .catch((err) => {
+        logger.error(`DB error - projects - ${ err }`);
 
-    logger.info(`DELETE: Project id ${ projectId }`);
-    res.status(204).json({ status: 'ok' });
+        return next(err);
+      });
   });
 };

@@ -87,3 +87,5 @@ SPECS/
 *.service
 
 .vscode
+
+.env
