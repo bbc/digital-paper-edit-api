@@ -3,7 +3,7 @@ const {
   getCollection,
   getItem,
   deleteItem,
-  updateItem,
+  putItem,
   postItem
 } = require("../db");
 
