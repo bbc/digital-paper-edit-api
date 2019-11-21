@@ -1,21 +1,29 @@
 const cuid = require('cuid');
 
-const logger = require('../lib/logger.js');
+const knex = require('../knex/knex');
+const logger = require('../lib/logger');
+const date = require('../lib/utils').postgresDate;
 
-const data = require('../sample-data/annotations.sample.json');
+const TABLE = 'Annotations';
 
 module.exports = (app) => {
-  app.post('/api/projects/:projectId/transcripts/:transcriptId/annotations', (req, res) => {
+  app.post('/api/projects/:projectId/transcripts/:transcriptId/annotations', (req, res, next) => {
     const newAnnotation = req.body;
     newAnnotation.id = cuid();
 
-    data.annotations.push(newAnnotation);
+    knex(TABLE)
+      .insert(newAnnotation)
+      .then(() => {
+        logger.info(`POST: New annotation ${ newAnnotation.id }`);
+        res.status(201).json({ status: 'OK', newAnnotation });
+      }).catch((err) => {
+        logger.error(`DB error - annotations - ${ err }`);
 
-    res.status(201).json({ status: 'ok', annotation: newAnnotation });
-    logger.info({ status: 201, request: 'POST', message: `New annotation ${ newAnnotation.id } created for transcript ${ req.params.transcriptId } in project ${ req.params.projectId }` });
+        return next(err);
+      });
   });
 
-  app.get('/api/projects/:projectId/transcripts/:transcriptId/annotations', (req, res) => {
+  app.get('/api/projects/:projectId/transcripts/:transcriptId/annotations', (req, res, next) => {
     const projectId = req.params.projectId;
     const transcriptId = req.params.transcriptId;
 
@@ -25,7 +33,7 @@ module.exports = (app) => {
     });
   });
 
-  app.get('/api/projects/:projectId/transcripts/:transcriptId/annotations/:annotationId', (req, res) => {
+  app.get('/api/projects/:projectId/transcripts/:transcriptId/annotations/:annotationId', (req, res, next) => {
     const projectId = req.params.projectId;
     const transcriptId = req.params.transcriptId;
     const annotationId = req.params.annotationId;
@@ -37,7 +45,7 @@ module.exports = (app) => {
     res.status(200).json( { annotation });
   });
 
-  app.put('/api/projects/:projectId/transcripts/:transcriptId/annotations/:annotationId', (req, res) => {
+  app.put('/api/projects/:projectId/transcripts/:transcriptId/annotations/:annotationId', (req, res, next) => {
     const projectId = req.params.projectId;
     const transcriptId = req.params.transcriptId;
     const annotationId = req.params.annotationId;
@@ -50,7 +58,7 @@ module.exports = (app) => {
     res.status(200).json({ status: 'ok', annotation: updatedAnnotation });
   });
 
-  app.delete('/api/projects/:projectId/transcripts/:transcriptId/annotations/:annotationId', (req, res) => {
+  app.delete('/api/projects/:projectId/transcripts/:transcriptId/annotations/:annotationId', (req, res, next) => {
     const projectId = req.params.projectId;
     const transcriptId = req.params.transcriptId;
     const annotationId = req.params.annotationId;

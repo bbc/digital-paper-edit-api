@@ -1,6 +1,6 @@
 // const cuid = require('cuid');
 
-const logger = require('../lib/logger.js');
+const logger = require('../lib/logger');
 const knex = require('../knex/knex');
 const date = require('../lib/utils').postgresDate;
 

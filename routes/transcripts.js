@@ -1,7 +1,10 @@
 const path = require('path');
 const cuid = require('cuid');
 const formidable = require('formidable');
-const logger = require('../lib/logger.js');
+
+const logger = require('../lib/logger');
+const knex = require('../knex/knex');
+const date = require('../lib/utils').postgresDate;
 
 const data = require('../sample-data/transcripts.sample.json');
 
@@ -12,45 +15,33 @@ const sampleTranscriptInProgress = require('../sample-data/transcripts/in-progre
 
 const sampleTranscripts = [ sampleTranscriptKate, sampleTranscriptMorgan, sampleTranscriptIvan, sampleTranscriptInProgress ];
 
+const TABLE = 'Transcripts';
+
 module.exports = (app) => {
   app.post('/api/projects/:projectId/transcripts', (req, res, next) => {
-    const projectId = req.params.projectId;
-    const newTranscriptId = cuid();
+    const newTranscript = {
+      id: cuid(),
+      title: req.body.title,
+      description: req.body.description,
+      status: 'in-progress',
+      project_id: req.params.projectId,
+      data: {},
+      speakers: {},
+      created_at: date(),
+      updated_at: date(),
+    };
 
-    const form = new formidable.IncomingForm();
-    form.uploadDir = path.join(__dirname, '..', 'tmpMedia');
-    form.keepExtensions = true;
-    form.keepFilenames = true; // TODO: this `keepFilenames` does not seem to work, flag in that issue?
-    form.type = 'multipart';
+    knex(TABLE)
+      .insert(newTranscript)
+      .then(() => {
+        logger.info('POST: New transcript', { newTranscript });
 
-    form
-      .on('fileBegin', (name, file) => {
-        file.path = path.join(form.uploadDir, file.name);
-      })
-      .on('error', (err) => {
-        logger.error(`Job failed: project ${ projectId }, due to ${ err }`);
+        res.status(201).json({ status: 'OK', newTranscript });
+      }).catch((err) => {
+        logger.error(`DB error - projects - ${ err }`);
 
-        return next(err);
-      })
-      .on('aborted', (err) => {
-        logger.error(`Aborted job for project ${ projectId }, due to ${ err }`);
-
-        return next(err);
+        next(err);
       });
-
-    form.parse(req, (err, fields) => {
-      console.log('fields::', fields);
-      const newTranscript = {
-        title: fields.title,
-        description: fields.description,
-        id: newTranscriptId,
-        status: 'in-progress',
-      };
-
-      data.transcripts.push(newTranscript);
-      logger.info(`POST: transcript ${ newTranscriptId } for project ${ projectId }`);
-      res.status(201).json({ status: 'ok', transcript: newTranscript });
-    });
   });
 
   app.get('/api/projects/:projectId/transcripts', (req, res) => {
