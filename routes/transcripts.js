@@ -3,20 +3,20 @@ const cuid = require('cuid');
 const formidable = require('formidable');
 const logger = require('../lib/logger.js');
 
-const data = require('../sample-data/transcripts.sample.json');
+const db = require('../dbWrapper/index.js');
 
-const sampleTranscriptKate = require('../sample-data/transcripts/kate.transcript.sample.json');
-const sampleTranscriptMorgan = require('../sample-data/transcripts/morgan.transcript.sample.json');
-const sampleTranscriptIvan = require('../sample-data/transcripts/ivan.transcript.sample.json');
-const sampleTranscriptInProgress = require('../sample-data/transcripts/in-progress.transcript.sample.json');
+// const data = require('../sample-data/transcripts.sample.json');
 
-const sampleTranscripts = [ sampleTranscriptKate, sampleTranscriptMorgan, sampleTranscriptIvan, sampleTranscriptInProgress ];
+// const sampleTranscriptKate = require('../sample-data/transcripts/kate.transcript.sample.json');
+// const sampleTranscriptMorgan = require('../sample-data/transcripts/morgan.transcript.sample.json');
+// const sampleTranscriptIvan = require('../sample-data/transcripts/ivan.transcript.sample.json');
+// const sampleTranscriptInProgress = require('../sample-data/transcripts/in-progress.transcript.sample.json');
+
+// const sampleTranscripts = [ sampleTranscriptKate, sampleTranscriptMorgan, sampleTranscriptIvan, sampleTranscriptInProgress ];
 
 module.exports = (app) => {
   app.post('/api/projects/:projectId/transcripts', (req, res, next) => {
     const projectId = req.params.projectId;
-    const newTranscriptId = cuid();
-
     const form = new formidable.IncomingForm();
     form.uploadDir = path.join(__dirname, '..', 'tmpMedia');
     form.keepExtensions = true;
@@ -41,14 +41,18 @@ module.exports = (app) => {
     form.parse(req, (err, fields) => {
       logger.info(`INFO: Fields: ${ fields }`);
 
-      const newTranscript = {
+      const newTranscriptData = {
+        projectId,
         title: fields.title,
         description: fields.description,
-        id: newTranscriptId,
+        // id: newTranscriptId,
+        url: null,
         status: 'in-progress',
       };
 
-      data.transcripts.push(newTranscript);
+      const newTranscript = db.create('transcripts', newTranscriptData);
+      const newTranscriptId = newTranscript._id;
+      newTranscript.id = newTranscriptId;
       logger.info(`POST: transcript ${ newTranscriptId } for project ${ projectId }`);
       res.status(201).json({ status: 'ok', transcript: newTranscript });
     });
@@ -56,6 +60,23 @@ module.exports = (app) => {
 
   app.get('/api/projects/:projectId/transcripts', (req, res) => {
     const projectId = req.params.projectId;
+    const data = {};
+
+    data.transcripts = db.getAll('transcripts', { projectId });
+
+    console.log('data.transcripts', data.transcripts);
+    if (data.transcripts) {
+      // data.transcripts = [ data.transcripts ];
+      data.transcripts = data.transcripts
+      // Temporary workaround.
+        .map((transcript) => {
+          transcript.id = transcript._id;
+
+          return transcript;
+        });
+    } else {
+      data.transcripts = [];
+    }
     logger.info(`GET: transcripts for project ${ projectId }`);
     res.status(200).json(data);
   });
@@ -64,7 +85,8 @@ module.exports = (app) => {
     const projectId = req.params.projectId;
     const transcriptId = req.params.transcriptId;
 
-    const transcript = sampleTranscripts.find(t => t.id === transcriptId);
+    // const transcript = sampleTranscripts.find(t => t.id === transcriptId);
+    const transcript = db.get('transcripts', { _id: transcriptId, projectId });
 
     if (!transcript) {
       const err = new Error('No transcript found');
@@ -74,6 +96,8 @@ module.exports = (app) => {
       return next(err);
     }
 
+    transcript.id = transcript._id;
+
     logger.info(`GET — Transcript ${ transcriptId } from project ${ projectId }`);
 
     return res.status(200).json(transcript);
@@ -82,27 +106,34 @@ module.exports = (app) => {
   app.put('/api/projects/:projectId/transcripts/:transcriptId', (req, res) => {
     const projectId = req.params.projectId;
     const transcriptId = req.params.transcriptId;
-
+    console.log('app.put', req.body);
     const updatedTranscript = {
-      id: projectId,
+      // projectId,
       title: req.body.title,
       description: req.body.description,
     };
+    if (req.body.words) {
+      updatedTranscript.transcript = {};
+      updatedTranscript.transcript.words = req.body.words;
+      if (req.body.paragraphs) {
+        updatedTranscript.transcript.paragraphs = req.body.paragraphs;
+      }
+    }
 
-    const transcriptIndex = data.transcripts.findIndex(item => item.id === transcriptId);
-    data.transcripts[transcriptIndex] = updatedTranscript;
-
-    logger.info(`PUT — New Transcript ${ transcriptId } for project ${ projectId }`);
+    const updated = db.update('transcripts', { _id: transcriptId }, updatedTranscript);
+    console.log(updated);
+    console.log('updatedTranscript', updatedTranscript);
+    updatedTranscript.id = updatedTranscript._id;
+    logger.info(`PUT — Update Transcript ${ transcriptId } for project ${ projectId }`);
     res.status(200).json({ transcript: updatedTranscript });
   });
 
   app.delete('/api/projects/:projectId/transcripts/:transcriptId', (req, res) => {
     const projectId = req.params.projectId;
     const transcriptId = req.params.transcriptId;
-
-    data.transcripts = data.transcripts.filter(t => t.id !== transcriptId);
-
+    // data.transcripts = data.transcripts.filter(t => t.id !== transcriptId);
+    db.delete('transcripts', { _id: transcriptId, projectId });
     logger.info(`DELETE - Transcript ${ transcriptId } from project ${ projectId }`);
-    res.status(204).json({ message: `DELETE: transcript ${ transcriptId }` });
+    res.status(204).json({ status: 'ok', message: `DELETE: transcript ${ transcriptId }` });
   });
 };

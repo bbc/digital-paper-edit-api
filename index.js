@@ -1,6 +1,7 @@
 require('./config');
 
 const fs = require('fs');
+const path = require('path');
 const express = require('express');
 const bodyParser = require('body-parser');
 
@@ -36,6 +37,11 @@ app.use((err, req, res, next) => {
       message: errorMessage,
     });
 });
+
+// Temporary public folder to serve media locally for user testing
+// change url in transcript to be eg
+// ß"url": "http://localhost:8080/static/w1a-clip.mp4",
+app.use('/static', express.static(path.join(__dirname, 'public')));
 
 app.listen(port, () => logger.info(`App listening on port ${ port }`));
 module.exports = app;
