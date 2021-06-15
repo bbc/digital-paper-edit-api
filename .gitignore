@@ -87,3 +87,5 @@ SPECS/
 *.service
 
 .vscode
+
+functions/db/permissions.json
